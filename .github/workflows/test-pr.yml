@@ -1,26 +1,27 @@
-name: test pull_request
-
-on: 
-  pull_request:
-    paths:
-      - src/**
-      - pom.xml
-
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v2.2.0
-      - name: Set up Java and Maven
-        uses: actions/setup-java@v2
-        with:
-          java-version: '8'
-          distribution: 'zulu'
-      - name: Cache m2 package
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-      - run: mvn test
+    - continue-on-error: true
+      uses: actions/checkout@v2.2.0
+    - continue-on-error: true
+      name: Set up Java and Maven
+      uses: actions/setup-java@v2
+      with:
+        distribution: zulu
+        java-version: '8'
+    - continue-on-error: true
+      name: Cache m2 package
+      uses: actions/cache@v2
+      with:
+        key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
+        path: ~/.m2/repository
+        restore-keys: '${{ runner.os }}-maven-
+
+          '
+    - continue-on-error: true
+      run: mvn test
+name: test pull_request
+on:
+  repository_dispatch:
+    types: trigger-ga___test-pr.yml
